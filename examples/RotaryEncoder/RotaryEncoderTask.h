@@ -57,6 +57,7 @@ private:
 
     EncoderButtonState _buttonState;
     uint8_t _clockState;
+    uint8_t _dataState;
 
 
     virtual bool OnStart()
@@ -66,6 +67,7 @@ private:
         pinMode(_dataPin, INPUT_PULLUP);
         _buttonState = EncoderButtonState_Released;
         _clockState = HIGH;
+        _dataState = HIGH;
         return true;
     }
 
@@ -99,15 +101,23 @@ private:
                     _rotationValue++;
                     _rotationCallback(1);
                 }
-                else
-                {
-                    // counter-clockwise
+            }
+
+            _clockState = clockState;
+        }
+        if (dataState != _dataState)
+        {
+            if (dataState == LOW)
+            {
+                // just read data trigger
+                if (clockState == LOW){
+                    // counter clockwise
                     _rotationValue--;
                     _rotationCallback(-1);
                 }
             }
 
-            _clockState = clockState;
+            _dataState = dataState;
         }
     }
 
